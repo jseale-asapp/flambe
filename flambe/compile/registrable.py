@@ -1,4 +1,4 @@
-from typing import Type, TypeVar, Callable, Mapping, Dict, List, Any, Optional, Set
+from typing import Type, TypeVar, Callable, Mapping, Dict, List, Any, Optional, Set, NamedTuple, Sequence, Iterable
 from abc import abstractmethod, ABC
 from collections import defaultdict
 from warnings import warn
@@ -8,6 +8,8 @@ import inspect
 
 from ruamel.yaml import YAML, ScalarNode
 
+
+ROOT_NAMESPACE = ''
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,108 @@ class RegistrationError(Exception):
     """
 
     pass
+
+
+class RegistryEntry(NamedTuple):
+    """Entry in the registry representing a class, its tags, factories"""
+
+    class_: type
+    default_tag: str
+    aliases: List[str]
+    factories: List[str]
+
+
+# Maps from class to registry entry, which contains the tags, aliases,
+# and factory methods
+SubRegistry = Dict[Type, RegistryEntry]
+
+
+class Singleton(type):
+
+    _instance = None
+
+    def __call__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__call__(*args, **kwargs)
+        return cls._instance
+
+
+class Registry(metaclass=Singleton):
+
+    def __init__(self):
+        self.namespaces: Dict[str, SubRegistry] = defaultdict(Registry)
+        self.class_to_namespaces: Dict[type, Sequence[str]] = defaultdict(list)
+
+    def create(self,
+               class_: Type,
+               namespace: str = ROOT_NAMESPACE,
+               tags: Optional[Sequence[str]] = None,
+               factories: Optional[Sequence[str]] = None):
+        if class_ in self.class_to_namespace:
+            raise Exception(f'Cannot create entry for existing class {class_.__name__}. '
+                            'Try updating instead')
+        if tags is not None and len(tags) < 1:
+            raise ValueError('At least one tag must be specified. If the default (class name) '
+                             'desired, pass in nothing or None.')
+        if factories is not None and len(factories) < 1:
+            raise ValueError('At least one factory must be specified if any are given.')
+        tags = tags or [class_.__name__]
+        default_tag = tags[0]
+        factories = factories or []
+        new_entry = RegistryEntry(class_, default_tag, tags, factories)
+        self.namespaces[namespace][class_] = new_entry
+        self.class_to_namespace[class_] = namespace
+
+    def read(self):
+        pass
+
+    def add_tag(self,
+                class_: Type,
+                tag: str,
+                namespace: str = ROOT_NAMESPACE):
+        pass
+
+    def add_factory(self,
+                    class_: Type,
+                    factory: str,
+                    namespace: str = ROOT_NAMESPACE):
+        pass
+
+    def delete(self, class_: Type, namespace: Optional[str] = None) -> bool:
+        if namespace is not None:
+            if class_ not in self.class_to_namespaces:
+                return False
+            if namespace not in self.namespaces:
+                return False
+            if namespace not in self.class_to_namespaces[class_]:
+                return False
+            try:
+                del self.namespaces[namespace][class_]
+            except KeyError:
+                raise Exception('Invalid registry state')
+            del self.class_to_namespace[class_]
+            return True
+        else:
+            count = 0
+            for sub_registry in self.namespaces.values():
+                if class_ in sub_registry:
+                    del sub_registry[class_]
+                    count += 1
+            if count == 0:
+                return False
+            if count >= 1:
+                if class_ not in self.class_to_namespaces:
+                    raise Exception('Invalid registry state')
+                del self.class_to_namespace[class_]
+                return True
+
+    def __iter__(self) -> Iterable[RegistryEntry]:
+        for class_, namespace in self.class_to_namespace.items():
+            yield self.namespaces[namespace][class_]
+
+
+def get_registry():
+    return Registry()
 
 
 def make_from_yaml_with_metadata(from_yaml_fn: Callable[..., Any],
