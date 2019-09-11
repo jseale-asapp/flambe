@@ -15,7 +15,7 @@ The website is implemented using Flask.
 """
 
 import os
-from flask import Flask, render_template, send_file, jsonify
+from flask import Flask, render_template, send_file, jsonify, Response
 
 import shutil
 
@@ -101,12 +101,13 @@ def stream():
         return None
 
     def generate():
-        with open(app.config['output_log']) as f:
-            while True:
-                yield f.read()
+        while True:
+            with open(app.config['output_log']) as f:
+                content = f.read()
+                yield content
                 sleep(1)
 
-    return app.response_class(generate(), mimetype='text/plain')
+    return Response(generate(), mimetype="text/event-stream")
 
 
 @app.route('/state')
