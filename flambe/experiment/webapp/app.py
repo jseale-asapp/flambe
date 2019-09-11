@@ -23,7 +23,6 @@ import shutil
 import pickle
 import subprocess
 import tempfile
-from time import sleep
 
 app = Flask(__name__)
 
