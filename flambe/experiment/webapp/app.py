@@ -15,6 +15,7 @@ The website is implemented using Flask.
 """
 
 import os
+import html
 from flask import Flask, render_template, send_file, jsonify, Response
 
 import shutil
@@ -102,6 +103,7 @@ def output():
 
     with open(app.config['output_log']) as f:
         content = f.read()
+        content = html.escape(content)
         return Response(content, mimetype="text/plain")
 
 

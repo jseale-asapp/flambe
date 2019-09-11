@@ -76,6 +76,7 @@
            type: "GET",
            url: "{{ url_for('output') }}",
            data: "user=success",
+           cache: false,
            success: function(msg){
              document.getElementById('output').innerHTML = msg;
            }
