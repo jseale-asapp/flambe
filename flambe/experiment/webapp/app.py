@@ -95,19 +95,14 @@ def download_logs(block=None, variant=None):
                          attachment_filename=f"{output_name}-logs.tar")
 
 
-@app.route('/stream')
-def stream():
+@app.route('/output')
+def output():
     if app.config['output_log'] is None:
         return None
 
-    def generate():
-        while True:
-            with open(app.config['output_log']) as f:
-                content = f.read()
-                yield content
-                sleep(1)
-
-    return Response(generate(), mimetype="text/event-stream")
+    with open(app.config['output_log']) as f:
+        content = f.read()
+        return Response(content, mimetype="text/plain")
 
 
 @app.route('/state')

@@ -71,27 +71,21 @@
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script>
-        // From https://stackoverflow.com/questions/7740646/jquery-read-ajax-stream-incrementally
-        var last_response_len = false;
-        $.ajax('{{ url_for('stream') }}', {
-            xhrFields: {
-                onprogress: function(e)
-                {
-                    var this_response, response = e.currentTarget.response;
-                    if(last_response_len === false)
-                    {
-                        this_response = response;
-                        last_response_len = response.length;
-                    }
-                    else
-                    {
-                        this_response = response.substring(last_response_len);
-                        last_response_len = response.length;
-                    }
-                    document.getElementById('output').innerHTML = this_response;
-                }
-            }
-        })
+        function ajaxd() { 
+          $.ajax({
+           type: "GET",
+           url: "{{ url_for('output') }}",
+           data: "user=success",
+           success: function(msg){
+             document.getElementById('output').innerHTML = msg;
+           }
+         });
+        }
+
+        $(document).ready(function() {
+            setInterval(ajaxd, 1000);
+        });
+
     </script>
 
 
