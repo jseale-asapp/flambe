@@ -11,6 +11,7 @@ jobs:
         #       - flambe-cache-{{ .Branch }}
         #       - flambe-cache-
         - run: echo $TWINE_USERNAME
+        - run: echo $TWINE_USERNAME
         # - run: python3 -m pip install --user tox awscli
         # - run: python3 -m awscli configure set region us-east-1
         # - run:
