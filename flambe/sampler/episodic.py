@@ -40,7 +40,7 @@ class EpisodicSampler(Sampler):
         balance_query : bool, optional
             If True, the same number of query points are sampled per
             class, otherwise query points are sampled uniformly
-            from the input data
+            from the input data. Default ``False``.
 
         """
         self.pad = pad_index
