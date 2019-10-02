@@ -39,7 +39,9 @@ workflows:
   version: 2
   build:
     jobs:
-      - test
+      - test:
+           context: flambe-publisher
+
       - end2end:
           requires:
             - test
