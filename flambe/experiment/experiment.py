@@ -344,13 +344,13 @@ class Experiment(ClusterRunnable):
                                                   raise_on_failed_trial=False)
                 logger.debug(f"Finish running all tune.Experiments for {block_id}")
 
-                error = False
+                any_error = False
                 for t in trials:
                     if t.status == t.ERROR:
                         logger.error(f"{t} ended with ERROR status.")
                         success[block_id] = False
-                        error = True
-                if error and self.stop_on_failure:
+                        any_error = True
+                if any_error and self.stop_on_failure:
                     self.teardown()
                     logger.error("Stopping experiment because there was an error and "
                                  "stop_on_failure == True.")
