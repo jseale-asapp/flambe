@@ -352,8 +352,9 @@ class Experiment(ClusterRunnable):
                         any_error = True
                 if any_error and self.stop_on_failure:
                     self.teardown()
-                    logger.error("Stopping experiment because there was an error and "
-                                 "stop_on_failure == True.")
+                    logger.error(f"Stopping experiment at block '{block_id}' because there was an "
+                                 "error and stop_on_failure == True.")
+                    return
 
                 # Save checkpoint location
                 # It should point from:
