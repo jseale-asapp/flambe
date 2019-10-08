@@ -102,6 +102,7 @@ class Experiment(ClusterRunnable):
                  reduce: Optional[Dict[str, int]] = None,
                  env: RemoteEnvironment = None,
                  max_failures: int = 1,
+                 stop_on_failure: bool = False,
                  merge_plot: bool = True) -> None:
         super().__init__(env)
         self.name = name
@@ -143,6 +144,7 @@ class Experiment(ClusterRunnable):
         self.reduce = reduce or dict()
         self.resources = resources or dict()
         self.max_failures = max_failures
+        self.stop_on_failure = stop_on_failure
         self.merge_plot = merge_plot
         if pipeline is None or not isinstance(pipeline, (Dict, OrderedDict)):
             raise TypeError("Pipeline argument is not of type Dict[str, Schema]. "
@@ -342,10 +344,16 @@ class Experiment(ClusterRunnable):
                                                   raise_on_failed_trial=False)
                 logger.debug(f"Finish running all tune.Experiments for {block_id}")
 
+                error = False
                 for t in trials:
                     if t.status == t.ERROR:
                         logger.error(f"{t} ended with ERROR status.")
                         success[block_id] = False
+                        error = True
+                if error and self.stop_on_failure:
+                    self.teardown()
+                    logger.error("Stopping experiment because there was an error and "
+                                 "stop_on_failure == True.")
 
                 # Save checkpoint location
                 # It should point from:
@@ -395,6 +403,16 @@ class Experiment(ClusterRunnable):
             self.progress_state.checkpoint_end(block_id, checkpoints, success[block_id])
             logger.debug(f"Done running {block_id}")
 
+        self.teardown()
+
+        if all(success.values()):
+            logger.info(cl.GR("Experiment ended successfully"))
+        else:
+            raise error.UnsuccessfulRunnableError(
+                "Not all trials were successful. Check the logs for more information"
+            )
+
+    def teardown(self):
         # Disconnect process from ray cluster
         ray.shutdown()
 
@@ -407,13 +425,6 @@ class Experiment(ClusterRunnable):
                 logger.debug(f"Node shutdown {'successful' if ret == 0 else 'failed'} in {f}")
 
         self.progress_state.finish()
-
-        if all(success.values()):
-            logger.info(cl.GR("Experiment ended successfully"))
-        else:
-            raise error.UnsuccessfulRunnableError(
-                "Not all trials were successful. Check the logs for more information"
-            )
 
     def setup(self, cluster: Cluster, extensions: Dict[str, str], force: bool, **kwargs) -> None:
         """Prepare the cluster for the Experiment remote execution.
