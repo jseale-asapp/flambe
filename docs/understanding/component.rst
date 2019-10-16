@@ -13,9 +13,9 @@ Loading and Dumping from YAML
 -----------------------------
 
 A :class:`~flambe.compile.Component` can be created from a YAML config representation,
-as seen the :ref:`starting-quickstart_label` example.
+as seen in the :ref:`starting-quickstart_label` example.
 
-Lets take the previously used :class:`~flambe.nlp.classification.TextClassifier` component:
+Let's take the previously used :class:`~flambe.nlp.classification.TextClassifier` component:
 
 .. code-block:: yaml
     :caption: model.yaml
@@ -88,7 +88,7 @@ and :meth:`~flambe.compile.Component.load_state` methods that work similarly to 
 In order to identify and describe changes in class definitions, flambé supports
 opt-in semantic class versioning. (If you're not familiar with semantic versioning see `this link <https://semver.org/>`_).
 
-Each class has a class property ``_flambe_version`` to prevent conflics when loading
+Each class has a class property ``_flambe_version`` to prevent conflicts when loading
 previously saved states.
 Initially, all versions are set to ``0.0.0``, indicating that class versioning should
 not be used. Once you increment the version, Flambé will then start comparing
