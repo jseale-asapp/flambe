@@ -13,7 +13,7 @@ Loading and Dumping from YAML
 -----------------------------
 
 A :class:`~flambe.compile.Component` can be created from a YAML config representation,
-as seen the :ref:`starting-quickstart_label` example.
+as seen in the :ref:`starting-quickstart_label` example.
 
 Lets take the previously used :class:`~flambe.nlp.classification.TextClassifier` component:
 
@@ -34,7 +34,7 @@ Lets take the previously used :class:`~flambe.nlp.classification.TextClassifier`
         input_size: 256
         output_size: 10
 
-Loading and dumping objects can be done using ``flambe.compile.yaml`` module.
+Loading and dumping objects can be done using the ``flambe.compile.yaml`` module.
 
 .. code-block:: python
     :linenos:
@@ -91,7 +91,7 @@ opt-in semantic class versioning. (If you're not familiar with semantic versioni
 Each class has a class property ``_flambe_version`` to prevent conflics when loading
 previously saved states.
 Initially, all versions are set to ``0.0.0``, indicating that class versioning should
-not be used. Once you increment the version, Flambé will then start comparing
+not be used. Once you increment the version, flambé will then start comparing
 the saved class version with the version on the class at load-time.
 
 .. seealso::
@@ -168,7 +168,7 @@ Core Components
         text_field.process("Flambe rocks")  # Returns tensor([6, 1])
 
 :class:`~flambe.sampler.Sampler`
-    A sampler produces batches of data, as an interator. We provide a simple ``BaseSampler`` implementation, which takes a dataset as input, as well
+    A sampler produces batches of data, as an iterator. We provide a simple ``BaseSampler`` implementation, which takes a dataset as input, as well
     as the batch size, and produces batches of data. Each batch is a tuple of tensors, padded to the maximum length along each dimension.
 
     .. code-block:: python
