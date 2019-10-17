@@ -9,13 +9,13 @@ common and useful being the :class:`~flambe.experiment.Experiment` class which f
 executing a ML pipeline.
 
 The ``Experiment``'s most important parameter is the :attr:`~flambe.experiment.Experiment.pipeline`, where users can define
-a `DAG <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`_ of ``Components`` describing how dataset, models, training procedures, etc interact
+a `DAG <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`_ of ``Components`` describing how dataset, models, training procedures, etc., interact
 between them.
 
 .. attention::
     For a full specification of ``Experiment``, see :class:`~flambe.experiment.Experiment`
 
-The implementation of :class:`~flambe.experiment.Experiment` and its `pipeline`` uses
+The implementation of :class:`~flambe.experiment.Experiment` and its ``pipeline`` uses
 `Ray's Tune <https://ray.readthedocs.io/en/latest/tune.html>`_ under the hood.
 
 Pipeline
